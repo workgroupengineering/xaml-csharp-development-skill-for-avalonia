@@ -27,6 +27,7 @@ DEFAULT_PATTERNS = [
     "build/**/*.props",
     "build/**/*.targets",
 ]
+DEFAULT_MAX_PER_FILE = 300
 
 TYPE_DECL_RE = re.compile(
     r"^\s*(public|internal|private|protected)\s+"
@@ -36,12 +37,29 @@ TYPE_DECL_RE = re.compile(
 
 NAMESPACE_RE = re.compile(r"^\s*namespace\s+([A-Za-z_][A-Za-z0-9_.]*)\s*[;{]")
 PUBLIC_RE = re.compile(r"^\s*public\s+")
+ACCESS_MODIFIER_RE = re.compile(r"^\s*(public|internal|private|protected)\b")
+DECLARATION_START_RE = re.compile(
+    r"^\s*(?:"
+    r"event\b|"
+    r"static\b|"
+    r"abstract\b|"
+    r"sealed\b|"
+    r"partial\b|"
+    r"delegate\b|"
+    r"new\b|"
+    r"unsafe\b|"
+    r"readonly\b|"
+    r"ref\b|"
+    r"[A-Za-z_@]"
+    r")"
+)
 
 
 @dataclass
 class TypeScope:
     name: str
     is_public: bool
+    is_interface: bool
     brace_depth: int
 
 
@@ -116,6 +134,15 @@ def area_for(rel: str) -> str:
     return "Other"
 
 
+def is_implicit_interface_member_start(line: str, scope: TypeScope | None) -> bool:
+    if scope is None or not (scope.is_public and scope.is_interface):
+        return False
+    stripped = line.lstrip()
+    if stripped.startswith(("[", "}", "#")) or stripped.startswith("public:"):
+        return False
+    return ACCESS_MODIFIER_RE.match(line) is None and DECLARATION_START_RE.match(line) is not None
+
+
 def extract_signatures(path: pathlib.Path) -> tuple[str | None, list[str]]:
     namespace: str | None = None
     in_block = False
@@ -143,7 +170,15 @@ def extract_signatures(path: pathlib.Path) -> tuple[str | None, list[str]]:
 
         if pending_type is not None and "{" in clean:
             t_name, t_public = pending_type
-            type_stack.append(TypeScope(name=t_name, is_public=t_public, brace_depth=depth + 1))
+            t_kind = t_name.split(" ", 1)[0]
+            type_stack.append(
+                TypeScope(
+                    name=t_name,
+                    is_public=t_public,
+                    is_interface=t_kind == "interface",
+                    brace_depth=depth + 1,
+                )
+            )
             pending_type = None
 
         type_match = TYPE_DECL_RE.match(line)
@@ -159,18 +194,26 @@ def extract_signatures(path: pathlib.Path) -> tuple[str | None, list[str]]:
                 signatures.append(normalize_signature(line))
 
             if "{" in clean:
-                type_stack.append(TypeScope(name=f"{kind} {name}", is_public=is_public, brace_depth=depth + 1))
+                type_stack.append(
+                    TypeScope(
+                        name=f"{kind} {name}",
+                        is_public=is_public,
+                        is_interface=kind == "interface",
+                        brace_depth=depth + 1,
+                    )
+                )
             else:
                 pending_type = (f"{kind} {name}", is_public)
 
-        innermost_public = type_stack[-1].is_public if type_stack else False
-        member_depth = type_stack[-1].brace_depth if type_stack else -1
+        current_scope = type_stack[-1] if type_stack else None
+        innermost_public = current_scope.is_public if current_scope else False
+        member_depth = current_scope.brace_depth if current_scope else -1
 
         if pending_sig is None:
             if (
                 innermost_public
                 and depth == member_depth
-                and PUBLIC_RE.match(line)
+                and (PUBLIC_RE.match(line) or is_implicit_interface_member_start(line, current_scope))
                 and not is_type_decl
                 and not line.lstrip().startswith("public:")
             ):
@@ -214,6 +257,10 @@ def write_markdown(
     git_ref: str | None = None,
 ) -> tuple[int, int]:
     now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+    try:
+        output_label = output.relative_to(pathlib.Path.cwd()).as_posix()
+    except ValueError:
+        output_label = output.as_posix()
 
     by_area: dict[str, list[tuple[str, str | None, list[str]]]] = {}
     total_sigs = 0
@@ -247,7 +294,9 @@ def write_markdown(
     regen_cmd = "python3 scripts/generate_api_index.py --repo <path-to-avalonia-repo>"
     if git_ref:
         regen_cmd += f" --git-ref {git_ref}"
-    regen_cmd += " --output references/api-index-generated.md"
+    regen_cmd += f" --output {output_label}"
+    if max_per_file != DEFAULT_MAX_PER_FILE:
+        regen_cmd += f" --max-per-file {max_per_file}"
     lines.append("```bash")
     lines.append(regen_cmd)
     lines.append("```")
@@ -310,7 +359,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--max-per-file",
         type=int,
-        default=300,
+        default=DEFAULT_MAX_PER_FILE,
         help="Maximum signatures to print per file before truncation note.",
     )
     return parser
