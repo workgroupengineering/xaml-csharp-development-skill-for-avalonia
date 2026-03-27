@@ -1,7 +1,7 @@
 {
   "name": "development-plugin-for-avalonia-repo",
   "interface": {
-    "displayName": "Avalonia Repo"
+    "displayName": "Development Plugin for Avalonia"
   },
   "plugins": [
     {

@@ -38,7 +38,7 @@ That makes local testing easier:
 
 This repo intentionally uses the repository root as the plugin root, so the repo marketplace keeps `source.path` at `./` instead of copying the plugin under `./plugins/`.
 
-The repo marketplace name is intentionally distinct from the plugin name so Codex can present the marketplace source and the plugin identity separately.
+The repo marketplace keeps a distinct internal `name` for catalog and cache identity while preserving the visible `displayName` used by the plugin brand.
 
 The plugin manifest now uses plugin-specific PNG assets for `composerIcon` and `logo` so the plugin directory can render branded artwork from common image formats.
 

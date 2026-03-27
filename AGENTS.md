@@ -51,7 +51,7 @@ python3 scripts/generate_api_index.py \
 - Keep the repo-local wrapper thin and route into the canonical umbrella workflow or focused plugin skills.
 - Keep `SKILL.md` bodies short and route to shared references instead of copying large content into each skill.
 - Put trigger conditions in frontmatter descriptions, not in long body sections.
-- Keep the repo marketplace `name` distinct from the plugin `name` so marketplace identity and plugin identity do not collapse into the same label or cache segment.
+- Keep the repo marketplace `name` distinct from the plugin `name` so catalog and cache identity stay stable, even if the visible marketplace `displayName` intentionally matches the plugin brand.
 - If the repo root itself is the plugin root, keep the marketplace `source.path` at `./` and document that choice in `README.md`.
 - When adding, renaming, or removing a skill, update all relevant navigation points:
   - `.agents/skills/development-plugin-for-avalonia/SKILL.md`
