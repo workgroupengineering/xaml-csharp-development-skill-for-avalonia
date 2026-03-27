@@ -2,23 +2,25 @@
 
 ## Purpose
 
-This repository defines and maintains the `development-plugin-for-avalonia` plugin, its repo-local wrapper skill, and its focused Avalonia skills.
+This repository defines and maintains the `development-plugin-for-avalonia` plugin, its repo-local wrapper skill, its repo marketplace metadata, and its focused Avalonia skills.
 
 Primary goals:
 - keep guidance accurate to the pinned Avalonia release,
 - split broad Avalonia guidance into granular, reusable skills,
 - keep app-development references shared instead of duplicated across skills,
-- maintain clear navigation across `.agents/skills/development-plugin-for-avalonia/SKILL.md`, `SKILL.md`, `skills/*/SKILL.md`, `README.md`, and `references/`.
+- maintain clear navigation across `.agents/skills/development-plugin-for-avalonia/SKILL.md`, `SKILL.md`, `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `skills/*/SKILL.md`, `README.md`, and `references/`.
 
 ## Source of Truth
 
 Use these files in this order:
 1. `.agents/skills/development-plugin-for-avalonia/SKILL.md` (repo-local discovery entrypoint)
 2. `SKILL.md` (canonical umbrella routing workflow and default behavior)
-3. `skills/*/SKILL.md` (focused workflows for the active lane)
-4. `references/compendium.md` (reference index and task navigation)
-5. `references/00-api-map.md` (curated app-facing API map)
-6. `references/api-index-generated.md` (broad signature lookup)
+3. `.codex-plugin/plugin.json` (plugin package metadata, branding, and bundled component paths)
+4. `.agents/plugins/marketplace.json` (repo marketplace metadata and local install path)
+5. `skills/*/SKILL.md` (focused workflows for the active lane)
+6. `references/compendium.md` (reference index and task navigation)
+7. `references/00-api-map.md` (curated app-facing API map)
+8. `references/api-index-generated.md` (broad signature lookup)
 
 If they conflict, align all skills and docs to the pinned version and update the conflicting files.
 
@@ -40,6 +42,7 @@ python3 scripts/generate_api_index.py \
 ## Skill Authoring Rules
 
 - Repo-local skill entrypoints live under `.agents/skills/<skill-name>/`.
+- Repo marketplace metadata lives under `.agents/plugins/marketplace.json`.
 - Specialist skills live under `skills/<skill-name>/`.
 - Keep skill names lower-case hyphen-case.
 - Each discovered skill entrypoint should have:
@@ -48,9 +51,13 @@ python3 scripts/generate_api_index.py \
 - Keep the repo-local wrapper thin and route into the canonical umbrella workflow or focused plugin skills.
 - Keep `SKILL.md` bodies short and route to shared references instead of copying large content into each skill.
 - Put trigger conditions in frontmatter descriptions, not in long body sections.
+- Keep the repo marketplace `name` distinct from the plugin `name` so marketplace identity and plugin identity do not collapse into the same label or cache segment.
+- If the repo root itself is the plugin root, keep the marketplace `source.path` at `./` and document that choice in `README.md`.
 - When adding, renaming, or removing a skill, update all relevant navigation points:
   - `.agents/skills/development-plugin-for-avalonia/SKILL.md`
   - `SKILL.md`
+  - `.codex-plugin/plugin.json` if bundle paths or install-surface metadata change
+  - `.agents/plugins/marketplace.json` if the plugin path or marketplace presentation changes
   - `README.md`
   - any other skill that routes to it
 
@@ -105,10 +112,12 @@ Coverage target is practical completeness for app development, not 100% signatur
 
 Before finalizing changes:
 1. Verify repo-local, root, and specialist skill routing still matches the current skill catalog.
-2. Verify new or renamed skills are reflected in `README.md` and any routing skill that mentions them.
-3. Verify examples use APIs available in Avalonia `11.3.12` unless the skill explicitly targets the Avalonia 12 lane.
-4. Re-run coverage tooling when API-focused references changed.
-5. Ensure no accidental drift to `master`-only APIs.
+2. Verify plugin manifest paths, branding assets, and legal links still resolve from `.codex-plugin/plugin.json`.
+3. Verify repo marketplace metadata still points at the intended plugin root and uses a marketplace identity distinct from the plugin identity.
+4. Verify new or renamed skills are reflected in `README.md` and any routing skill that mentions them.
+5. Verify examples use APIs available in Avalonia `11.3.12` unless the skill explicitly targets the Avalonia 12 lane.
+6. Re-run coverage tooling when API-focused references changed.
+7. Ensure no accidental drift to `master`-only APIs.
 
 ## Commits
 

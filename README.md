@@ -22,9 +22,25 @@ This repo now supports both Codex discovery paths at the same time:
 
 - Repo-local skill discovery uses [`.agents/skills/development-plugin-for-avalonia/SKILL.md`](.agents/skills/development-plugin-for-avalonia/SKILL.md) as the broad entrypoint when Codex is working inside this checkout.
 - Plugin discovery uses [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json), which exposes the focused skills under [`skills/`](skills).
+- Repo marketplace discovery can use [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json), which points back to this repo root as the plugin directory.
 
 The repo-local skill is intentionally thin. It forwards broad requests into the focused plugin skills and shared references instead of duplicating the full guidance.
 The root [`SKILL.md`](SKILL.md) is the canonical umbrella workflow source, not the repo-local discovery entrypoint.
+
+## Local Install
+
+This repository now includes a repo marketplace file at [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json).
+
+That makes local testing easier:
+
+- from this checkout, Codex can read the repo marketplace and find the plugin without creating a separate personal marketplace just for local testing
+- for personal install, you can still copy the plugin to `~/.codex/plugins/` and add an entry to `~/.agents/plugins/marketplace.json`
+
+This repo intentionally uses the repository root as the plugin root, so the repo marketplace keeps `source.path` at `./` instead of copying the plugin under `./plugins/`.
+
+The repo marketplace name is intentionally distinct from the plugin name so Codex can present the marketplace source and the plugin identity separately.
+
+The plugin manifest now uses plugin-specific PNG assets for `composerIcon` and `logo` so the plugin directory can render branded artwork from common image formats.
 
 ## Avalonia Version Coverage
 
@@ -46,6 +62,7 @@ This repository also carries a dedicated Avalonia 12 migration lane:
 
 - [`.agents/skills/development-plugin-for-avalonia/SKILL.md`](.agents/skills/development-plugin-for-avalonia/SKILL.md): broad repo-local routing skill
 - [`SKILL.md`](SKILL.md): canonical umbrella workflow source shared by the repo-local wrapper, not a repo-local discovery path
+- [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json): repo marketplace entry exposing this repo itself as the plugin directory
 
 ### Core Avalonia Skills
 
@@ -92,6 +109,7 @@ The skills share one reference corpus instead of duplicating docs inside every s
 ## Repository Structure
 
 - [`SKILL.md`](SKILL.md): canonical umbrella workflow source
+- [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json): repo marketplace for loading this repo as a local plugin, with the repo root acting as the plugin root
 - [`.agents/skills/development-plugin-for-avalonia/SKILL.md`](.agents/skills/development-plugin-for-avalonia/SKILL.md): repo-local skill entrypoint for this checkout
 - [`skills/`](skills): focused skill folders with their own `SKILL.md` and `agents/openai.yaml`
 - [`references/`](references): shared reference corpus

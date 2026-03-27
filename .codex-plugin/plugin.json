@@ -7,8 +7,8 @@
     "email": "wieslawsoltes@users.noreply.github.com",
     "url": "https://github.com/wieslawsoltes"
   },
-  "homepage": "https://github.com/wieslawsoltes/xaml-csharp-development-skill-for-avalonia",
-  "repository": "https://github.com/wieslawsoltes/xaml-csharp-development-skill-for-avalonia",
+  "homepage": "https://github.com/wieslawsoltes/development-plugin-for-avalonia",
+  "repository": "https://github.com/wieslawsoltes/development-plugin-for-avalonia",
   "license": "MIT",
   "keywords": [
     "avalonia",
@@ -34,17 +34,17 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/wieslawsoltes/xaml-csharp-development-skill-for-avalonia",
-    "privacyPolicyURL": "https://github.com/wieslawsoltes",
-    "termsOfServiceURL": "https://github.com/wieslawsoltes/xaml-csharp-development-skill-for-avalonia/blob/main/LICENSE",
+    "websiteURL": "https://github.com/wieslawsoltes/development-plugin-for-avalonia",
+    "privacyPolicyURL": "https://github.com/wieslawsoltes/development-plugin-for-avalonia/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/wieslawsoltes/development-plugin-for-avalonia/blob/main/TERMS.md",
     "defaultPrompt": [
       "Build a modern Avalonia app and route the work to the right specialist skill",
       "Port this WPF, WinForms, WinUI, or HTML UI to Avalonia",
       "Review an Avalonia project for AOT-safe bindings, styling, and performance"
     ],
     "brandColor": "#0F6CBD",
-    "composerIcon": "./assets/xaml-csharp-development-skill-for-avalonia-small.svg",
-    "logo": "./assets/xaml-csharp-development-skill-for-avalonia.png",
+    "composerIcon": "./assets/development-plugin-for-avalonia-icon.png",
+    "logo": "./assets/development-plugin-for-avalonia-logo.png",
     "screenshots": []
   }
 }
